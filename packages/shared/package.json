@@ -1,0 +1,9 @@
+{
+  "name": "@the-shop/account-store",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./accountStore.js"
+  }
+}

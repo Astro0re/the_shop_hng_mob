@@ -1,0 +1,33 @@
+{
+  "name": "the-shop-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "expo/AppEntry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "api": "node backend/index.js"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "@supabase/supabase-js": "^2.57.0",
+    "@the-shop/account-store": "file:./packages/shared",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "expo": "^44.0.6",
+    "expo-auth-session": "~57.0.13",
+    "expo-linking": "~57.0.11",
+    "expo-status-bar": "~57.0.1",
+    "expo-web-browser": "~57.0.3",
+    "express": "^5.1.0",
+    "form-data": "^4.0.1",
+    "mailgun.js": "^11.1.0",
+    "nodemailer": "^10.0.14",
+    "react": "19.2.3",
+    "react-native": "^0.72.17",
+    "react-native-safe-area-context": "~5.6.2",
+    "react-native-url-polyfill": "^2.0.0"
+  }
+}
