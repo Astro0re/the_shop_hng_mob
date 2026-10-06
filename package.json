@@ -6,8 +6,8 @@
   "main": "expo/AppEntry",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "api": "node backend/index.js"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "@the-shop/account-store": "file:./packages/shared",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
+    "eas": "^0.1.0",
     "expo": "~57.0.1",
     "expo-auth-session": "~57.0.13",
     "expo-dev-client": "~57.0.19",

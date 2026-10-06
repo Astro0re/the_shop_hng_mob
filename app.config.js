@@ -16,5 +16,12 @@ module.exports = ({ config }) => ({
     package: process.env.EXPO_ANDROID_PACKAGE || 'com.example.theshop',
     adaptiveIcon: { backgroundColor: '#52684f' },
   },
+  extra: {
+    ...(config.extra || {}),
+    eas: {
+      ...((config.extra && config.extra.eas) || {}),
+      projectId: '338c5bbf-b014-4b33-95f3-218eeb937961',
+    },
+  },
   plugins: ['expo-web-browser'],
 });
