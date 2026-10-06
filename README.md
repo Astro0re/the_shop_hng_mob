@@ -6,6 +6,7 @@ Standalone Expo companion app for The Shop. It shares Supabase accounts, listing
 
 1. Install Node.js 22.13 or newer, then run `npm install` in this folder.
 2. Preserve your local `.env` file and fill in the values listed in `.env.example`. The Expo `EXPO_PUBLIC_` variables are bundled into the mobile client; use only the Supabase anon/publishable key there. Keep the Supabase service-role key and all email credentials private in `.env`.
+   For APKs built on EAS, add `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` to the EAS **preview** environment too: ignored local `.env` files are not uploaded to cloud builds. These two values are intended for the client app; never add the service-role key or email credentials as `EXPO_PUBLIC_` variables. Set `EXPO_PUBLIC_API_URL` in EAS preview as well if the APK must send seller inquiries to a deployed API.
 3. In Supabase SQL Editor, run `supabase/schema.sql`, then `supabase/migrations/202610030001_account_sync.sql`. These create the marketplace and account-owned basket/saved-find tables with row-level security.
 4. Enable Google in Supabase Auth. Add `<EXPO_PUBLIC_APP_SCHEME>://auth/callback` to its redirect URL allowlist. Configure Google's OAuth client to use the Supabase callback URL displayed in the provider settings.
 5. Start the API with `npm run api` and the mobile app with `npm start` in separate terminals. On an Android emulator, set `EXPO_PUBLIC_API_URL=http://10.0.2.2:3001`; on a physical device, use the computer's LAN address. iOS simulator can use `http://localhost:3001`.

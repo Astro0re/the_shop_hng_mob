@@ -37,6 +37,7 @@ function ShopApp() {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('All things');
   const [loadingItems, setLoadingItems] = useState(true);
+  const [listingError, setListingError] = useState('');
   const [loadingAccount, setLoadingAccount] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -50,14 +51,19 @@ function ShopApp() {
   }, []);
 
   const refreshListings = useCallback(async () => {
-    if (!supabase) return;
+    if (!supabase) throw new Error(supabaseConfigIssue || 'Supabase is not configured for this build.');
     const { data, error } = await supabase.from('listings').select('*').eq('status', 'active').order('created_at', { ascending: false });
     if (error) throw error;
     setItems((data || []).map((item) => ({ ...item, isDemo: false })));
+    setListingError('');
   }, []);
 
   useEffect(() => {
-    if (!supabase) return undefined;
+    if (!supabase) {
+      setListingError(supabaseConfigIssue || 'Supabase is not configured for this build.');
+      setLoadingItems(false);
+      return undefined;
+    }
     let active = true;
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
       if (active) setSession(currentSession);
@@ -78,7 +84,9 @@ function ShopApp() {
       }
       activeUserId.current = nextUserId;
     });
-    refreshListings().catch((error) => showNotice(error.message || 'Could not load listings. Pull down to retry.')).finally(() => setLoadingItems(false));
+    refreshListings().catch((error) => {
+      setListingError(error.message || 'Could not load listings. Check your connection and retry.');
+    }).finally(() => setLoadingItems(false));
     return () => { active = false; subscription.unsubscribe(); };
   }, [refreshListings, showNotice]);
 
@@ -282,8 +290,19 @@ function ShopApp() {
         setCart(state.cart);
         setFavorites(state.favorites);
       }
-    } catch (error) { showNotice(error.message || 'Refresh failed. Check your connection and retry.'); }
+    } catch (error) {
+      setListingError(error.message || 'Refresh failed. Check your connection and retry.');
+      showNotice(error.message || 'Refresh failed. Check your connection and retry.');
+    }
     finally { setRefreshing(false); }
+  }
+
+  async function retryListings() {
+    setListingError('');
+    setLoadingItems(true);
+    try { await refreshListings(); }
+    catch (error) { setListingError(error.message || 'Could not load listings. Check your connection and retry.'); }
+    finally { setLoadingItems(false); }
   }
 
   function ListingCard({ item }) {
@@ -312,7 +331,7 @@ function ShopApp() {
       <View style={styles.searchBox}><Text style={styles.searchIcon}>⌕</Text><TextInput value={query} onChangeText={setQuery} placeholder="Find something lovely" placeholderTextColor="#94998f" style={styles.searchInput} returnKeyType="search" /></View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRail}>{categories.map((name) => <Pressable key={name} onPress={() => setCategory(name)} style={[styles.categoryChip, category === name && styles.categoryChipActive]}><Text style={[styles.categoryText, category === name && styles.categoryTextActive]}>{name}</Text></Pressable>)}</ScrollView>
       <View style={styles.sectionHeading}><View><Text style={styles.sectionEyebrow}>A few things worth finding</Text><Text style={styles.sectionTitle}>The good finds.</Text></View><Text style={styles.resultCount}>{visibleItems.length} finds</Text></View>
-      {loadingItems ? <ActivityIndicator color={green} style={styles.loader} /> : <ListingList data={visibleItems} emptyTitle="No live listings just yet." emptyText="When neighbours share their finds, you’ll see them here." />}
+      {loadingItems ? <ActivityIndicator color={green} style={styles.loader} /> : listingError ? <View style={styles.emptyCard}><Text style={styles.emptyTitle}>Couldn’t load the finds.</Text><Text style={styles.emptyText}>{listingError}</Text><Pressable style={styles.textButton} onPress={retryListings}><Text style={styles.textButtonText}>Try again →</Text></Pressable></View> : <ListingList data={visibleItems} emptyTitle="No live listings just yet." emptyText="When neighbours share their finds, you’ll see them here." />}
     </>;
 
     if (screen === 'Basket') return <>
